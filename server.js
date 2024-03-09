@@ -1,7 +1,5 @@
-const hostname = '127.0.0.1';
-const port = 3000;
-
 const express = require('express');
+
 const app = express();
 
 app.get('/', (req, res) => {
@@ -24,4 +22,4 @@ app.use('/routines', routinesRouter);
 app.use('/weights', weightsRouter);
 app.use('/workouts', workoutsRouter);
 
-app.listen(port);
+app.listen(3000);
