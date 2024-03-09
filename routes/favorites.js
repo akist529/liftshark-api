@@ -2,28 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const db = require('../db');
-
-async function tableExists (name) {
-    const queryString = `SHOW TABLES like '${name}'`;
-
-    return await db.query(queryString).then(res => {
-        if (res.length > 0) return true;
-            else return false;
-    }).catch(err => {
-        throw new Error(err);
-    });
-}
-
-async function itemExists (table, variable, value) {
-    const queryString = `SELECT * FROM ${table} WHERE ${variable} LIKE ${value}`;
-
-    return await db.query(queryString).then(res => {
-        if (res.length > 0) return true;
-            else return false;
-    }).catch(err => {
-        throw new Error(err);
-    });
-}
+const { tableExists, itemExists } = require('../helpers');
 
 router.get('/', (req, res) => {
     let sql = 'SELECT * FROM favorites';
