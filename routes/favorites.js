@@ -3,6 +3,28 @@ const router = express.Router();
 
 const db = require('../db');
 
+async function tableExists (name) {
+    const queryString = `SHOW TABLES like '${name}'`;
+
+    return await db.query(queryString).then(res => {
+        if (res.length > 0) return true;
+            else return false;
+    }).catch(err => {
+        throw new Error(err);
+    });
+}
+
+async function itemExists (table, variable, value) {
+    const queryString = `SELECT * FROM ${table} WHERE ${variable} LIKE ${value}`;
+
+    return await db.query(queryString).then(res => {
+        if (res.length > 0) return true;
+            else return false;
+    }).catch(err => {
+        throw new Error(err);
+    });
+}
+
 router.get('/', (req, res) => {
     let sql = 'SELECT * FROM favorites';
 
@@ -22,19 +44,9 @@ router.get('/', (req, res) => {
 });
 
 router.post('/:id', async (req, res) => {
-    let queryString = "SHOW TABLES like 'favorites'";
+    const favoritesExists = await tableExists('favorites');
 
-    const tableExists = await db.query(queryString).then((res => {
-        if (res.length > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    })).catch(err => {
-        throw new Error(err);
-    });
-
-    if (!tableExists) {
+    if (!favoritesExists) {
         queryString = 'CREATE TABLE favorites (id INT AUTO_INCREMENT, exercise INT, PRIMARY KEY(id))';
 
         await db.query(queryString).then(res => {
@@ -44,18 +56,10 @@ router.post('/:id', async (req, res) => {
         });
     }
 
-    queryString = 'SELECT * FROM favorites WHERE exercise LIKE ?';
-    const id = req.params.id;
-
-    const alreadyFavorited = await db.query(queryString, id).then(res => {
-        if (res.length > 0) return true;
-            else return false;
-    }).catch(err => {
-        throw new Error(err);
-    });
+    const alreadyFavorited = await itemExists('favorites', 'exercise', req.params.id);
 
     if (alreadyFavorited) {
-        console.log('Exercise already favorited');
+        console.log('Exercise already favorited')
         return res.status(200).json({ success: 'Exercise already favorited' });
     }
 
