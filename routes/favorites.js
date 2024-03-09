@@ -56,9 +56,9 @@ router.post('/:id', async (req, res) => {
         });
     }
 
-    const alreadyFavorited = await itemExists('favorites', 'exercise', req.params.id);
+    const itemFavorited = await itemExists('favorites', 'exercise', req.params.id);
 
-    if (alreadyFavorited) {
+    if (itemFavorited) {
         console.log('Exercise already favorited')
         return res.status(200).json({ success: 'Exercise already favorited' });
     }
@@ -75,36 +75,30 @@ router.post('/:id', async (req, res) => {
     return res.status(201).json({ success: 'Added new favorite exercise' });
 });
 
-router.delete('/:id', (req, res) => {
-    let sql = "SHOW TABLES like 'favorites'";
+router.delete('/:id', async (req, res) => {
+    const favoritesExists = await tableExists('favorites');
 
-    const tableExists = db.query(sql, (err, result) => {
-        if (err) {
-            throw err;
-        }
-
-        return result.length;
-    });
-
-    if (!tableExists) {
+    if (!favoritesExists) {
         console.log('Favorites table does not exist');
-        return res.status(200).json({ success: 'Favorites table does not exist' });
+        return res.status(200).json({ error: 'Favorites table does not exist' });
     }
 
-    sql = `DELETE FROM favorites WHERE exercise = ${req.params.id}`;
+    const itemFavorited = await itemExists('favorites', 'exercise', req.params.id);
 
-    db.query(sql, (err, result) => {
-        if (err) {
-            throw err;
-        }
+    if (!itemFavorited) {
+        console.log('Exercise not favorited');
+        return res.status(200).json({ error: 'Exercise not favorited' });
+    }
 
+    const queryString = 'DELETE FROM favorites WHERE exercise = ?';
+
+    await db.query(queryString, req.params.id).then(res => {
         console.log('Removed exercise from favorites');
-        return res.status(200).json({ success: 'Removed exercise from favorites' });
-    })
+    }).catch(err => {
+        throw new Error(err);
+    });
 
-    console.log(`DELETE /favorites/${id}`);
-    res.statusCode = 200;
-    res.send(`DELETE /favorites/${id}`);
+    return res.status(200).json({ success: 'Removed exercise from favorites' });
 });
 
 module.exports = router;
