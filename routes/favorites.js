@@ -2,24 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 const db = require('../db');
-const { tableExists, itemExists } = require('../helpers');
+const { tableExists, itemExists, getTableData } = require('../helpers');
 
-router.get('/', (req, res) => {
-    let sql = 'SELECT * FROM favorites';
-
-    db.query(sql, (err, result) => {
-        if (err) {
-            if (err.code === 'ER_NO_SUCH_TABLE') {
-                console.log('No favorites exist');
-                return res.json({ error: 'No favorites exist' });
-            } else {
-                throw err;
-            }
-        }
-
-        console.log('Sent favorites');
-        return res.status(200).json({ success: 'Sent favorites', data: result });
-    });
+router.get('/', async (req, res) => {
+    const data = await getTableData('favorites');
+    return res.status(200).json({ success: 'Fetched data from favorites', data });
 });
 
 router.post('/:id', async (req, res) => {

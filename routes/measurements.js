@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
+const db = require('../db');
+const { tableExists, itemExists } = require('../helpers');
+
 router.get('/', (req, res) => {
     console.log('GET /measurements');
     res.statusCode = 200;
