@@ -5,6 +5,12 @@ const db = require('../db');
 const { tableExists, itemExists, getTableData } = require('../helpers');
 
 router.get('/', async (req, res) => {
+    const favoritesExists = await tableExists('favorites');
+
+    if (!favoritesExists) {
+        return res.status(200).json({ message: 'No favorites data exists', data: [] });
+    }
+
     const data = await getTableData('favorites');
     return res.status(200).json({ success: 'Fetched data from favorites', data });
 });
@@ -13,7 +19,7 @@ router.post('/:id', async (req, res) => {
     const favoritesExists = await tableExists('favorites');
 
     if (!favoritesExists) {
-        queryString = 'CREATE TABLE favorites (id INT AUTO_INCREMENT, exercise INT, PRIMARY KEY(id))';
+        const queryString = 'CREATE TABLE favorites (id INT AUTO_INCREMENT, exercise INT, PRIMARY KEY(id))';
 
         await db.query(queryString).then(res => {
             console.log('Created favorites table');
@@ -26,7 +32,7 @@ router.post('/:id', async (req, res) => {
 
     if (itemFavorited) {
         console.log('Exercise already favorited')
-        return res.status(200).json({ success: 'Exercise already favorited' });
+        return res.status(200).json({ message: 'Exercise already favorited' });
     }
 
     let favorite = ({ exercise: req.params.id });
