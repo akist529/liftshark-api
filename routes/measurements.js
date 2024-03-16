@@ -19,7 +19,7 @@ router.post('/', async (req, res) => {
     const measurementsExists = await tableExists('measurements');
 
     if (!measurementsExists) {
-        const queryString = 'CREATE TABLE measurements (id INT AUTO_INCREMENT, date VARCHAR(255), muscle VARCHAR(255), measurement INT, PRIMARY KEY(id))';
+        const queryString = 'CREATE TABLE measurements (id INT PRIMARY KEY AUTO_INCREMENT, date VARCHAR(255) NOT NULL, muscle VARCHAR(255) NOT NULL, measurement INT NOT NULL)';
 
         await db.query(queryString).then(res => {
             console.log('Created measurements table');
@@ -113,7 +113,7 @@ router.delete('/:id', async (req, res) => {
 
     const queryString = `DELETE FROM measurements WHERE id = ${id}`;
 
-    await db.query(queryString, id).then(res => {
+    await db.query(queryString).then(res => {
         console.log(`Deleted measurement with id = ${id}`);
     }).catch(err => {
         throw new Error(err);

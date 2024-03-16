@@ -19,7 +19,7 @@ router.post('/:id', async (req, res) => {
     const favoritesExists = await tableExists('favorites');
 
     if (!favoritesExists) {
-        const queryString = 'CREATE TABLE favorites (id INT AUTO_INCREMENT, exercise INT, PRIMARY KEY(id))';
+        const queryString = 'CREATE TABLE favorites (id INT PRIMARY KEY AUTO_INCREMENT, exercise_id INT NOT NULL UNIQUE, owner_id INT NOT NULL UNIQUE)';
 
         await db.query(queryString).then(res => {
             console.log('Created favorites table');

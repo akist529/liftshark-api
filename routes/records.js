@@ -19,7 +19,7 @@ router.post('/', async (req, res) => {
     const recordsExists = await tableExists('records');
 
     if (!recordsExists) {
-        const queryString = 'CREATE TABLE records (id INT AUTO_INCREMENT, date VARCHAR(255), exercise INT, max INT, PRIMARY KEY(id))';
+        const queryString = 'CREATE TABLE records (id INT PRIMARY KEY AUTO_INCREMENT, date VARCHAR(255) NOT NULL, exercise_id INT NOT NULL, max INT NOT NULL)';
 
         await db.query(queryString).then(res => {
             console.log('Created records table');
@@ -113,7 +113,7 @@ router.delete('/:id', async (req, res) => {
 
     const queryString = `DELETE FROM records WHERE id = ${id}`;
 
-    await db.query(queryString, id).then(res => {
+    await db.query(queryString).then(res => {
         console.log(`Deleted personal record with id = ${id}`);
     }).catch(err => {
         throw new Error(err);
