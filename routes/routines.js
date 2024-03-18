@@ -55,7 +55,7 @@ router.post('/', async (req, res) => {
     const setsExists = await tableExists('sets');
 
     if (!setsExists) {
-        const queryString = 'CREATE TABLE sets (id INT PRIMARY KEY AUTO_INCREMENT, weight INT NOT NULL, reps INT NOT NULL, entry_id INT NOT NULL, routine_id INT NOT NULL, FOREIGN KEY (entry_id) REFERENCES entries(id), FOREIGN KEY (routine_id) REFERENCES routines(id))';
+        const queryString = 'CREATE TABLE sets (id INT PRIMARY KEY AUTO_INCREMENT, weight INT NOT NULL, reps INT NOT NULL, entry_id INT NOT NULL, routine_id INT, workout_id INT, FOREIGN KEY (entry_id) REFERENCES entries(id), FOREIGN KEY (routine_id) REFERENCES routines(id), FOREIGN KEY (workout_id) REFERENCES workouts(id))';
 
         await db.query(queryString).then(res => {
             console.log('Created workout sets table');
@@ -200,9 +200,9 @@ router.delete('/:id', async (req, res) => {
     }
 
     const id = req.params.id;
-    const recordExists = await itemExists('routines', 'id', id);
+    const routineExists = await itemExists('routines', 'id', id);
 
-    if (!recordExists) {
+    if (!routineExists) {
         console.log(`Tried to delete personal routine with id = ${id} which does not exist`);
         return res.status(200).json({ error: `Tried to delete personal routine with id = ${id} which does not exist` });
     }
