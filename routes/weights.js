@@ -49,7 +49,7 @@ router.post('/', async (req, res) => {
         measurement
     });
 
-    queryString = 'INSERT INTO weights SET *';
+    queryString = 'INSERT INTO weights SET ?';
 
     await db.query(queryString, newWeight).then(res => {
         console.log('Added new weight');
