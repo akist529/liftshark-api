@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
     const date = req.body.date;
     const muscle = req.body.muscle;
     const measurement = req.body.measurement;
-    let queryString = `SELECT * FROM measurements WHERE date LIKE '${date}' AND measurement LIKE '${measurement}'`;
+    let queryString = `SELECT * FROM measurements WHERE date LIKE '${date}' AND measurement LIKE ${measurement}`;
 
     const measurementExists = await db.query(queryString).then(res => {
         if (res.length > 0) return true;
